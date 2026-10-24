@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Performance Booster</title>
+
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef2fb;
+  --card:rgba(255,255,255,.74);
+  --card2:rgba(255,255,255,.93);
+  --tx:#14203a;
+  --mu:#5a6785;
+  --bd:rgba(20,32,70,.13);
+  --grid:rgba(30,50,110,.05);
+  --gs:16%;
+  --sh:0 8px 30px rgba(20,40,100,.10);
+  --ac:#2f6bff;
+  --ac2:#5b5bf0;
+  --sidebar-w: 240px;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0a1020;
+    --card:rgba(22,30,54,.68);
+    --card2:rgba(34,45,78,.9);
+    --tx:#e9eefc;
+    --mu:#9aa8c9;
+    --bd:rgba(150,170,255,.17);
+    --grid:rgba(160,180,255,.045);
+    --gs:30%;
+    --sh:0 10px 34px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a1020;
+  --card:rgba(22,30,54,.68);
+  --card2:rgba(34,45,78,.9);
+  --tx:#e9eefc;
+  --mu:#9aa8c9;
+  --bd:rgba(150,170,255,.17);
+  --grid:rgba(160,180,255,.045);
+  --gs:30%;
+  --sh:0 10px 34px rgba(0,0,0,.45);
+}
+:root[data-a="violet"]{--ac:#7048e8;--ac2:#a23de0}
+:root[data-a="emerald"]{--ac:#0b8a55;--ac2:#0a8f8f}
+:root[data-a="sunset"]{--ac:#d9480f;--ac2:#e8590c}
+:root[data-a="yellow"]{--ac:#e6a100;--ac2:#f59f00}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--tx);
+  font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  min-width: 320px;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(60rem 40rem at 8% -10%,color-mix(in srgb,var(--ac) var(--gs),transparent),transparent 60%),
+             radial-gradient(50rem 40rem at 100% 100%,color-mix(in srgb,var(--ac2) var(--gs),transparent),transparent 60%),
+             linear-gradient(var(--grid) 1px,transparent 1px) 0 0/44px 44px,
+             linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/44px 44px;
+}
+
+/* Scrollbars styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bd);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ac);
+}
+
+.w{
+  width:100%;
+  max-width: 100%;
+  margin:0 auto;
+  padding:18px 24px 40px;
+  transition: padding-left 0.3s ease;
+}
+
+/* Sidebar Toggle & Drawer */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  background: var(--card2);
+  color: var(--tx);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: var(--sh);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.sidebar-toggle-btn:hover {
+  border-color: var(--ac);
+  transform: translateY(-1px);
+}
+
+.left-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-w);
+  z-index: 10000;
+  background: var(--card2);
+  border-right: 1px solid var(--bd);
+  backdrop-filter: blur(16px);
+  box-shadow: 4px 0 25px rgba(0,0,0,0.15);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 60px 12px 20px 12px;
+  overflow-y: auto;
+}
+.left-sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--mu);
+  margin-bottom: 12px;
+  padding-left: 6px;
+}
+
+.sidebar-tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hero{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:16px 20px;
+  margin-top: 36px;
+  border:1px solid var(--bd);
+  border-radius:20px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%),var(--card);
+  backdrop-filter:blur(14px);
+  box-shadow:var(--sh);
+}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+  width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:26px;
+  background:linear-gradient(135deg,var(--ac),var(--ac2));
+  box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 45%,transparent);
+}
+h1{font-size:21px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{margin:2px 0 0;color:var(--mu);font-size:13px}
+.ctl{display:flex;align-items:center;gap:12px}
+#dots{display:flex;gap:8px}
+.ic{width:38px;height:38px;border-radius:12px;border:1px solid var(--bd);background:var(--card2);cursor:pointer;font-size:17px;display:grid;place-items:center}
+.dot{width:22px;height:22px;border-radius:50%;border:0;padding:0;cursor:pointer}
+.dot.on{outline:2px solid var(--tx);outline-offset:2px}
+
+.srch,.amt{position:relative}
+.srch{margin:16px 0 4px}
+.srch span,.amt span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mu)}
+input,select{width:100%;padding:12px 14px;border:1px solid var(--bd);border-radius:14px;background:var(--card2);color:var(--tx);font:inherit}
+input[type=search]{-webkit-appearance:none;appearance:none;padding-left:42px}
+.amt input{padding-left:30px}
+input:focus,select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 25%,transparent)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+/* Tabs with horizontal scrollable bar */
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  white-space: nowrap;
+  padding:8px 2px 12px;
+  margin-top:6px;
+  scrollbar-width: auto;
+}
+.tab{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  border:1px solid var(--bd);
+  border-radius:14px;
+  background:var(--card);
+  backdrop-filter:blur(10px);
+  color:var(--tx);
+  font:inherit;
+  font-weight:600;
+  cursor:pointer;
+  transition:.18s;
+}
+.tab span{font-size:18px}
+.tab:hover,.chip:hover{border-color:var(--ac)}
+.tab.on,.chip.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--ac),var(--ac2))}
+.tab.on{box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 40%,transparent)}
+
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.fld{margin:8px 0 14px}
+.chip{padding:9px 14px;border:1px solid var(--bd);border-radius:12px;background:var(--card2);color:var(--tx);font:inherit;cursor:pointer;transition:.15s}
+.lbl{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin-top:10px}
+.n{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:11px;color:#fff;background:linear-gradient(135deg,var(--ac),var(--ac2))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:16px;margin:12px 0;backdrop-filter:blur(14px);box-shadow:var(--sh)}
+.res{border-left:4px solid var(--ac);animation:up .3s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;color:color-mix(in srgb,var(--ac) 60%,var(--tx));background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.txt{white-space:pre-wrap;word-break:break-word;margin-top:12px}
+.hit{display:block;width:100%;text-align:left;cursor:pointer;color:var(--tx);font:inherit;transition:.15s}
+.hit:hover{border-color:var(--ac);transform:translateY(-1px)}
+.mu{color:var(--mu);font-size:13px}
+a{color:color-mix(in srgb,var(--ac) 60%,var(--tx))}
+mark{background:color-mix(in srgb,var(--ac) 30%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.hint{text-align:center;color:var(--mu);padding:22px 10px;border:1px dashed var(--bd);border-radius:16px;margin-top:8px}
+.cp{margin-top:12px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.st{padding:12px;border-radius:14px;border:1px solid var(--bd);background:var(--card2)}
+.st b{display:block;font-size:22px;margin-top:2px}
+.st.big{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--ac),var(--ac2))}
+.st.big .mu{color:rgba(255,255,255,.88)}
+.ft{text-align:center;color:var(--mu);font-size:12px;margin-top:28px}
+
+#scene{position:fixed;inset:0;z-index:-1;pointer-events:none}
+#scene svg{width:100%;height:100%;display:block}
+.sa{fill:var(--ac)}.sb{fill:var(--ac2)}.sc{fill:var(--tx)}
+.bl{animation:fl 7s ease-in-out infinite alternate}
+@keyframes fl{to{transform:translateY(-24px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.clk{font-weight:700;font-size:40px;line-height:1.1;margin:10px 0 4px;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.tool-win .tw-m{padding:4px 12px;font-weight:bold;font-size:16px;cursor:pointer}
+#dock{position:fixed;left:8px;bottom:8px;z-index:10003;display:flex;gap:8px;flex-wrap:wrap;max-width:calc(100vw - 16px)}#dock .chip{box-shadow:var(--sh)}
+.clk.warn{color:#e6a100}.clk.over{color:#e03131}
+.clk.end{color:color-mix(in srgb,var(--ac) 70%,var(--tx))}
+.tools{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.tl{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--card2);color:var(--tx);text-decoration:none;font-weight:600;font-size:13px;transition:.15s}
+.tl:hover{border-color:var(--ac);transform:translateX(3px)}
+.tl span{font-size:16px}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+
+/* Modal Popup for NPS Boosters & Activity Reminders */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn .2s ease;
+}
+.modal-box {
+  background: var(--card2);
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: var(--sh);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* Draggable tool windows */
+.tool-win{position:fixed;z-index:10002;width:420px;max-width:calc(100vw - 16px);max-height:85vh;display:flex;flex-direction:column;background:var(--card2);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--sh)}
+.tool-win .tw-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--bd);cursor:move;user-select:none;touch-action:none;border-radius:16px 16px 0 0}
+.tool-win .tw-title{margin:0;font-size:16px;display:flex;align-items:center;gap:8px}
+.tool-win .tw-x{padding:4px 12px;font-weight:bold;font-size:16px;cursor:pointer}
+.tool-win .tw-body{padding:12px;overflow:auto}
+#wm{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:-1;pointer-events:none;user-select:none;width:min(78vw,520px);opacity:.1}
+#wm svg{display:block;width:100%;height:auto}
+#wm .sq{fill:#1a2a6c}
+#wm .tx{fill:var(--tx)}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) #wm{opacity:.14}
+  :root:not([data-theme="light"]) #wm .sq{fill:#5b74e8}
+}
+:root[data-theme="dark"] #wm{opacity:.14}
+:root[data-theme="dark"] #wm .sq{fill:#5b74e8}
+</style>
+</head>
+<body>
+<div id="scene" aria-hidden="true"></div>
+<div id="wm" aria-hidden="true">
+<svg viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg" role="img">
+  <rect class="sq" x="8" y="10" width="110" height="110" rx="26"/>
+  <circle cx="63" cy="65" r="31" fill="#ffc72c"/>
+  <path d="M36 70 L92 40 L72 94 L62 74 Z" fill="#fff"/>
+  <path d="M62 74 L92 40" stroke="#1a2a6c" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <text class="tx" x="138" y="70" font-family="Inter,system-ui,Segoe UI,Arial,sans-serif" font-size="58" font-weight="800" letter-spacing="-2">Expedia</text>
+  <text class="tx" x="141" y="108" font-family="Inter,system-ui,Segoe UI,Arial,sans-serif" font-size="30" font-weight="600" letter-spacing="3">Group</text>
+</svg>
+</div>
+
+<!-- Left Floating Sidebar Toggle -->
+<button id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Navigation Tools Sidebar">
+  <span>☰</span> Tools
+</button>
+
+<!-- Persistent Embedded Tools Sidebar -->
+<aside id="leftSidebar" class="left-sidebar">
+  <div class="sidebar-title">Quick Tools</div>
+  <nav class="sidebar-tools-list" id="sidebarToolsList"></nav>
+</aside>
+
+<div class="w">
+<header class="hero">
+  <div class="brand">
+    <div class="logo-expedia" style="font-size:26px; font-weight:800; color:#ffc72c; letter-spacing:-1px; font-family:Inter,system-ui,sans-serif;">Expedia</div>
+    <div>
+      <h1>Performance Booster</h1>
+      <p class="sub">Quick reference for processes, policies and OKC compensation</p>
+    </div>
+  </div>
+  <div class="ctl">
+    <div id="dots"></div>
+    <button id="scn" class="ic" aria-label="Change background"></button>
+    <button id="mode" class="ic" aria-label="Switch light or dark mode"></button>
+  </div>
+</header>
+
+<div class="srch">
+  <span>🔍</span>
+  <input id="q" type="search" placeholder="Search all processes…" autocomplete="off">
+</div>
+
+<div id="main"></div>
+<div class="ft">Performance Booster · for internal use</div>
+</div>
+
+<!-- Modal Container for Reminders -->
+<div id="modalContainer"></div>
+<div id="toolWindows"></div>
+<div id="dock"></div>
+
+<script id="d" type="application/json">{"products": [{"name": "Hotel", "levels": ["refundability", "Payment type", "Intent"], "entries": [{"path": ["Refundable", "Pay now", "Cancel"], "text": "Proceed with the cancellation"}, {"path": ["Refundable", "Pay now", "Change"], "text": "Proceed with the Change based on availability and explain it to the customer"}, {"path": ["Refundable", "Pay now", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}, {"path": ["Refundable", "Pay later", "Cancel"], "text": "Proceed with the cancellation"}, {"path": ["Refundable", "Pay later", "Change"], "text": "Proceed with the Change based on availability and explain it to the customer"}, {"path": ["Refundable", "Pay later", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}, {"path": ["Refundable", "payment on schedules", "Cancel"], "text": "Proceed with the cancellation and we have to explain to the customer if the first payment is charged already it will be refunded by the hotel and if not it will not be charged as the booking is fully refundable"}, {"path": ["Refundable", "payment on schedules", "Change"], "text": "The payment on schedules booking can not be changed so we have to rebook and cancel and we have to explain to the customer if the first payment is charged already it will be refunded by the hotel and if not it will not be charged as the booking is fully refundable"}, {"path": ["Refundable", "payment on schedules", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}, {"path": ["Non Refundable", "Pay now", "Cancel"], "text": "Contact the hotel for an exception to cancel the booking and explain that to the customer if the hotel approved explain to the customer and proceed with the cancellation and don't forget to recap the refund amount and the timeframe if no response we should send an email and assign SR to the case if not approved we can offer alternatives like changing the name on the booking or if managed to get an approval from the hotel he should ask for the approvals first and last name and his job title so we can proceed with it"}, {"path": ["Non Refundable", "Pay now", "Change"], "text": "First we need to check for availbility for the new dates the customer is asking for or If adding extra night we should offer booking it seprately and we put a special request on it so he don't have to change the room depending on the hotel availbility but if no avail for the dates the customer want we can offer to cancel the booking so he can make a rebook for another hotel that have the dates he want available and we have to call the hotel to seek an exception for the change in both ways and if chnage not approved we check for cancellation"}, {"path": ["Non Refundable", "Pay now", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}, {"path": ["Non Refundable", "Pay later", "Cancel"], "text": "Contact the hotel for an exception to cancel the booking free of charge and if the hotel approved you can go ahead and cancel and remmber to not promise a refund as the customer wasn't charged already and if charged or pending charge you can explain to the customer that it's a pending charge that will drop soon within 24 hours maximum"}, {"path": ["Non Refundable", "Pay later", "Change"], "text": "Contact the hotel for an exception to Change  the booking free of charge and if the hotel approved you can go ahead and Change and remmber to not promise a refund as the customer wasn't charged already and if charged or pending charge you can explain to the customer that it's a pending charge that will drop soon within 24 hours maximum and if didn't approve to cancel we can check for approval to change the booking so we can offer it as alternative to the customer"}, {"path": ["Non Refundable", "Pay later", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}, {"path": ["Non Refundable", "payment on schedules", "Cancel"], "text": "Contact the hotel for an exception to cancel the booking free of charge and if the hotel approved you can go ahead and cancel and remmber to not promise a refund as the customer wasn't charged  and if charged Explain that it will be refunded by the hotel and if not charged you can explain that the charge will drop within 24 hours as it wasn't charged"}, {"path": ["Non Refundable", "payment on schedules", "Change"], "text": "As the payment on schedules booking can not be changed so we can offer to rebook or cancel so in that case we should seek an exception for the cancellation so the customer can rebook and we should call the hotel to seek an exception for that booking to cancel it free of charge and remmber to not promise a refund as the customer wasn't charged  and if charged Explain that it will be refunded by the hotel and if not charged you can explain that the charge will drop within 24 hours as it wasn't charged"}, {"path": ["Non Refundable", "payment on schedules", "Complaint"], "text": "• Transfer to Relocation / Tier 3 Team if:\n  - Health and safety issue\n  - Hotel cancelled the booking on customer\n  - Hotel is not able to accommodate the customer\n\n• Otherwise: Check the reasons in the calculator and proceed with the OKC accordingly."}]}, {"name": "NPS Boosters", "levels": ["Policy"], "entries": [{"path": ["Trust the traveler"], "text": "**Trust the traveler doesn’t apply to:**\n• Pay Later/Hotel Collect bookings where Expedia isn’t the merchant of record\n• 3PI bookings\n• Non-lodging parts of a package\n\n**Otherwise:**\n• If the customer claims he got an approval on the hotel booking verbally, we ask about the approval’s name and job title.\n• If the approval was by email, we ask for a screenshot.\n• If that was provided, we can proceed with the process without penalty."}, {"path": ["OneKeyCash refund option"], "text": "**OneKeyCash refund option for lodging (RWA# 6089)**\nFor eligible cancellations, always offer the traveler the choice between:\n• A refund to their original payment method, which takes up to 10 days\n• OneKeyCash, which they can use immediately to book again without waiting for the refund\n\nPlease check eligibility first (POS, payment type, Expedia Collect) and don’t mention OKC on ineligible bookings."}, {"path": ["Hotels.com US: Cancel for any reason"], "text": "**Hotels.com US: Cancel for any reason bookings (RWA# 5977)**\n• Non-refundable bookings with Cancel for any reason get a full card refund with no supplier approval, as long as they’re cancelled in OneDesk before 8:00 a.m. local property time on the check-in day.\n• After that time, standard non-refundable rules apply.\n• Date or room changes aren’t allowed. The traveler must cancel and rebook."}]}, {"name": "Cars", "levels": ["refundability", "Payment type", "Intent"], "entries": [{"path": ["Refundable", "Pay now Merchant", "Cancel"], "text": "Proceed with the cancellation if the customer is still active in chat with you and requested it"}, {"path": ["Refundable", "Pay now Merchant", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Refundable", "Pay now Merchant", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Refundable", "Pay now Merchant", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\nIf the vendor confirmed car was not available :\n\nCancel the original booking and process a full refund using the Credit workflow.\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor Was not reachable :\nExplain to the customer that we wasn’t able to reach the vendor and assign SR to reach the vendor and confirm it \n\nNotes:* Remmber if the amount Above  500 or more we assign SR for that refund \n•\tAlso the new booking hould be using the same payment type for the cancelled one"}, {"path": ["Refundable", "Pay Now agency", "Cancel"], "text": "Proceed with the cancellation if the customer is still active in chat with you and requested it"}, {"path": ["Refundable", "Pay Now agency", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Refundable", "Pay Now agency", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Refundable", "Pay Now agency", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\n\nIf the vendor confirmed the car was not available:\nCancel the original booking and let the vendor process the refund directly (do not process it yourself, as we are not the merchant of record).\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor was not reachable:\nExplain to the customer that we weren't able to reach the vendor today, and we will follow up with the rental company later to request refund approval.\n\nNotes:\nthe new booking should be using the same payment type as the cancelled one .                                                                .Enter case notes:\nFirst line: Name of the car company agent (first name and last name initial) who confirmed the issue, location of the car company agent.\nIf approved by centralized team, enter: Approved by centralized team at [location]\nSecond line: New booking conf number, name of new rental company, new booking amount, price difference covered by EG.\nExample:\nConfirmed no car availability with Timothy W from San Diego.\nAlternate booking: BC34567 with Hertz at $250, EG covered amount $150."}, {"path": ["Refundable", "Pay later", "Cancel"], "text": "Proceed with the cancellation if the customer is still active in chat with you and requested it"}, {"path": ["Refundable", "Pay later", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Refundable", "Pay later", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Refundable", "Pay later", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\n\nIf the vendor confirmed the car was not available:\nCancel the original booking (no initial refund is required since the traveler has not yet paid).\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor was not reachable:\nExplain to the customer that we weren't able to reach the car rental company.\nCancel the original booking.\n\nNotes:\n\nRemember if the price difference refund is $500 or more, we assign an SR for that refund.\n\nAlso, the new booking should be using the same payment type as the cancelled one."}, {"path": ["Non Refundable", "Pay now Merchant", "Cancel"], "text": "If the reason is Anything except:car unavailable, incorrect car type, missing reservation, poor car condition, location unexpectedly closed, or insurance issues, and the rental is covered by Article #000004490, we can cancel free of charge to the customer Only if the car venor is one of the listed in that article below.\nArticle #000004490: https://traveler.my.site.com/Runway/s/article/Car-Cancel-Waiver-policy?language=en_US            Note: If one of the reassons above is the customer's reasson we seek a wiaver from the car agency by calling them to seek an exception"}, {"path": ["Non Refundable", "Pay now Merchant", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Non Refundable", "Pay now Merchant", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Non Refundable", "Pay now Merchant", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\nIf the vendor confirmed car was not available :\n\nCancel the original booking and process a full refund using the Credit workflow.\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor Was not reachable :\nExplain to the customer that we wasn’t able to reach the vendor and assign SR to reach the vendor and confirm it \n\nNotes:* Remmber if the amount Above  500 or more we assign SR for that refund \n•\tAlso the new booking hould be using the same payment type for the cancelled one"}, {"path": ["Non Refundable", "Pay Now agency", "Cancel"], "text": "You can seek a waiver for supplier-driven issues or when the rental company employee refused a refund.\nContact the rental company and request a free cancellation + waiver of any penalty fees. If approved, document the employee’s name/title.\nDo NOT process the refund yourself. The supplier must issue the refund directly because we are not the merchant of record."}, {"path": ["Non Refundable", "Pay Now agency", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Non Refundable", "Pay Now agency", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Non Refundable", "Pay Now agency", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\n\nIf the vendor confirmed the car was not available:\nCancel the original booking and let the vendor process the refund directly (do not process it yourself, as we are not the merchant of record).\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor was not reachable:\nExplain to the customer that we weren't able to reach the vendor today, and we will follow up with the rental company later to request refund approval.\n\nNotes:\nthe new booking should be using the same payment type as the cancelled one .                                                                .Enter case notes:\nFirst line: Name of the car company agent (first name and last name initial) who confirmed the issue, location of the car company agent.\nIf approved by centralized team, enter: Approved by centralized team at [location]\nSecond line: New booking conf number, name of new rental company, new booking amount, price difference covered by EG.\nExample:\nConfirmed no car availability with Timothy W from San Diego.\nAlternate booking: BC34567 with Hertz at $250, EG covered amount $150."}, {"path": ["Non Refundable", "Pay later", "Cancel"], "text": "You can seek a waiver only if a credit card is attached and a penalty fee applies if not attached then it's risk free booking and customer will not be charged:\nContact the rental company and request a free cancellation + waiver of any penalty fees for supplier-driven issues or if the supplier refused a refund.\nIf approved, follow the Cancel and refund with waiver process. If there is no credit card attached, do not seek a waiver for a pre-trip cancellation."}, {"path": ["Non Refundable", "Pay later", "Change"], "text": "No changes on car bookings we should advise to cancel and rebook and you can search for alternatives on BSA"}, {"path": ["Non Refundable", "Pay later", "Billing"], "text": "If customer claims extra charges we should first ask for the reciept for that payments and we validate from voyager or BSA if that amount was mentioned in rules and regulations if yes we explain it if not we refund it to the customer as expedia loss payout after validating with superviosr"}, {"path": ["Non Refundable", "Pay later", "Car unavailable at pickup"], "text": "Contact the car rental counter to confirm the vehicle is unavailable.\n\nIf the vendor confirmed the car was not available:\nCancel the original booking (no initial refund is required since the traveler has not yet paid).\nAssist with rebooking and request post-trip receipts to refund any price difference.\n\nIf the vendor was not reachable:\nExplain to the customer that we weren't able to reach the car rental company.\nCancel the original booking.\n\nNotes:\n\nRemember if the price difference refund is $500 or more, we assign an SR for that refund.\n\nAlso, the new booking should be using the same payment type as the cancelled one."}]}, {"name": "Insurance", "levels": ["refundability", "Product", "Intent"], "entries": [{"path": ["Cancel button is working", "Hotel", "Cancel"], "text": "Proceed with the cancellation as it will be free of charge if the button is working"}, {"path": ["Cancel button is working", "Car", "Cancel"], "text": "Proceed with the cancellation as it will be free of charge if the button is working"}, {"path": ["Cancel button is working", "package", "Cancel"], "text": "Proceed with the cancellation as it will be free of charge if the button is working"}, {"path": ["Cancel button is not working", "Hotel", "Cancel"], "text": "For cancelling the insurance on a hotel booking we can only cancel in the following secnarios:\n\n\n\nWithin 15 days of purchase — if the trip hasn’t started and the traveler hasn’t filed a claim. \n\nVoided booking — if the original hotel booking was canceled within the 15-day cool-off period but the insurance was left active. \n\nSame-day hotel booking canceled — if the traveler cancels the same-day hotel booking was made , the travel protection can be refunded. \n\nHotel date change — if a new itinerary number is required and the change is within the 15-day window, cancel and refund the existing insurance. \n\n\n\nImportant: For a non-refundable hotel, do not cancel the insurance just because the hotel is non-refundable. The traveler should keep the insurance and contact the insurance provider to file a claim."}, {"path": ["Cancel button is not working", "Car", "Cancel"], "text": "We can process the refun for the insurance only in following secnarios :                                                                           Pre-trip cancellation — Traveler wants to cancel the car and/or insurance, as long as they haven’t picked up the car.\nChange of booking dates — Cancel the existing booking and rebook; the traveler can add insurance to the new booking.\nEG insurance not honored — The rental company refuses to accept the insurance or tells the traveler to buy different insurance.\nTraveler was charged extra for insurance — Document the issue and refund your insurance.\nNo-show / car not picked up — If the traveler never picked up the car, the insurance can be refunded. This applies up to 24 hours post-trip.\nCar canceled by the supplier — If the supplier cancels because of issues such as car unavailable, wrong car type, price mismatch, location closed, duplicate booking, or pickup timing issues, refund the insurance.\n\nImportant: If the traveler has already picked up the car, the insurance generally should not be refunded, except where the specific policy/process says otherwise."}, {"path": ["Cancel button is not working", "package", "Cancel"], "text": "Within 15 days of purchase — trip hasn’t started and no claim has been filed.\nVoided booking — the original package was canceled within the 15-day cool-off period, but the insurance was not canceled.\nDestination change — the original insurance is not valid for the new destination.\nPackage date change requiring a new itinerary number — the original protection does not cover the new booking."}]}, {"name": "Activity", "levels": ["refundability", "Intent"], "entries": [{"path": ["Direct supplier", "Cancel"], "text": "**Direct Supplier (EG Native) – Cancellation/Refund Process**\n\n1. **Supplier-driven issue:** No waiver approval is needed. Trust the customer and proceed with the refund.\n2. **Refund under $500:** Use the **Credit workflow** and file **Breakage**.\n3. **Refund over $500:** Create a **Refund Over $500 SR**.\n4. **Document the exact supplier-driven reason** in **Voyager Classic → Credit Notes** (e.g., supplier canceled, booking not confirmed, supplier denied service, overbooked, voucher/ticket not honored).\n5. **Do NOT call/email the supplier** or create a waiver SR for a supplier-driven Direct Supplier issue.\n\n**IMPORTANT – Round-trip Shuttle Services:**\nRound-trip Shuttle Services (e.g., **Airport → Hotel → Airport** or vice versa) are **excluded from auto approval**. Follow the regular process by **contacting the supplier to obtain a partial refund**.\n**If a full refund is processed on a round-trip shuttle, this will be considered an AGENT ERROR.**                                        If NOT supplier-driven:\n\nRefundable / within cancellation policy: Cancel normally in BSA → customer receives the applicable refund.\nNon-refundable / cancellation deadline passed: Reinforce the non-refundable policy. Do not call/email the supplier for a waiver and do not create a VNA case.\nChanges: Activity changes are not allowed → cancel and rebook using BSA."}, {"path": ["Direct supplier", "Change"], "text": "Activity changes are NOT allowed.\nCancel the current activity and rebook a new one using BSA.\nDo not call the supplier or send an email to request a change."}, {"path": ["Direct supplier", "Activity closed"], "text": "If you mean the activity is closed / partner is closed for a Direct Supplier, the process is:\n\nWithin the cancellation policy: Cancel the booking and email Activities Help for investigation.\nOutside the cancellation policy: Attempt to contact the supplier for refund approval and check the activity status.\nIf the supplier does not respond: Create a Refund Over $500 SR and email Activities Help.\nIf the supplier confirms the closure: Follow the refund action based on their response"}, {"path": ["Third party", "Cancel"], "text": "For Third-Party Supplier – Frontline (Viator / GYG)Article number1333:\n\nCancel – Refundable\nUse the Cancel button.\nIf Cancel is greyed out but the customer qualifies for a refund → process the Credit.\nReason: Site error / Agent Tool Refund Error\nNotify the appropriate 3P partner manually to accept the cancellation.\nYou can offer to book another activity.\nCancel – Non-refundable\nDo NOT call the activity provider.\nSend an email to the appropriate 3P partner to request cancellation/refund approval.\n3P email approval is required, even if the activity provider says they approved it.\n\nQuick rule:\nRefundable → Cancel/credit.\nNon-refundable → Email the 3P partner; don't call."}, {"path": ["Third party", "Change"], "text": "Activity changes are NOT allowed.\nCancel the current activity and rebook a new one using BSA.\nDo not call the supplier or send an email to request a change."}, {"path": ["Third party", "Activity closed"], "text": "For Third-Party Supplier – Frontline (Viator / GYG) when the activity is closed:\n\nDo NOT call the supplier.\nIdentify the 3P provider from the supplier reference:\nBR → Viator\nGYG → GetYourGuide\nSend an email to the appropriate 3P partner to request refund approval. Never email both providers.\nTell the customer that we need to email the activity provider to seek approval.\n\nQuick rule:\nActivity closed + 3P → Email the correct 3P partner, don’t call.\n3P email approval is required before processing the refund."}, {"path": ["Special agreement", "Cancel"], "text": "For a Special Agreement activity cancellation, the frontline process is:\n\nDo not contact the activity provider directly.\n\nTell the customer the activity is non-refundable and that you’ll submit a cancellation/refund request by email.\n\nFrom Voyager Next, email activitieshelp@expediagroup.com using the “Cancel and refund special agreement activity” template.\n\nTell the customer they should receive an email response within 5 days.\n\nPartner Support should generally only be contacted for extenuating circumstances, such as a flex policy, force majeure, hospitalization, death of a family member/friend, or Gold status.\n\nException: Disneyland California: bookings made before July 10, 2025 may still have a cancellation entitlement; send the request to the Activities Help Desk for processing."}, {"path": ["Special agreement", "Change"], "text": "Activity changes are NOT allowed.\nCancel the current activity and rebook a new one using BSA.\nDo not call the supplier or send an email to request a change."}, {"path": ["Special agreement", "Activity closed"], "text": "If the Special Agreement activity provider is permanently closed:\n\nTell the customer you’ll submit the refund request by email.\n\nEmail activitieshelp@expediagroup.com using the “Cancel and refund special agreement activity” template.\n\nTell the customer they should receive a response within 5 days.\n\nDo not contact the special-agreement supplier directly."}]}, {"name": "Loyalty(Onekeycash+Gift cards)", "levels": ["Intent"], "entries": [{"path": ["Earn and benfits"], "text": "Trip Elements\nCountable travel components: flights, hotel/car/vacation-rental/cruise nights, transfers, and activities.\n\nEach qualifying component counts as a trip element; qualification depends on the POSa minimum spend.\n\nOneKeyCash-redemption portions can still earn trip elements if the booking meets the threshold.\n\nTier Status\nTrip elements earned Jan 1–Dec 31 determine the next year's tier.\n\nBlue: 0 | Silver: 5 | Gold: 15 | Platinum: 30 trip elements.\n\nReaching a new tier early gives immediate status through the following full year.\n\nEarn Rates\nBase US POSa earn rates: Blue 1%, Silver/Gold 2%, Platinum 3% on eligible spend.\n\nVIP Access rates: Silver 3%, Gold 4%, Platinum 6%.\n\nRates can vary by POSa and brand; taxes/fees are excluded.\n\nTier Benefits\nHigher tiers provide increased Member Prices, VIP Access benefits, and higher OneKeyCash earnings.\n\nBenefits can include room upgrades, food/beverage perks, Price Tracking, and Price Drop Protection.\n\nGold/Platinum also receive priority support; Platinum has VIP Support.\n\nEarn Confirmation Timelines\nActivities, packages, Pay Now hotels/cars: up to 3 days after completion.\n\nFlights: up to 10 days; Pay Later hotel/Vrbo: up to 35 days.\n\nCruises: up to 45 days; Pay Later car: up to 90 days.\n\nIneligible for Rewards\nExamples: bookings before joining One Key, guest bookings, taxes/fees, insurance, coupons, gift cards, group rates, and direct airline bookings.\n\nUS POSa flight bookings are currently ineligible.\n\nTAAP agent-account bookings don't earn rewards, but personal One Key accounts can.\n\nMissing OneKeyCash or Trip Elements\nFirst verify that the booking is eligible and the confirmation timeframe has passed.\n\nIf eligible rewards are missing, manually adjust OneKeyCash/trip elements.\n\nUse the applicable Loyalty | One Key | Adjust OneKeyCash and trip elements process.\n\nVIP Access Earnings\nVIP Access properties provide higher OneKeyCash rates for Silver, Gold, and Platinum.\n\nSilver 3% | Gold 4% | Platinum 6% for the US POSa.\n\nRates may differ by POSa/brand.\n\nMobile App Bookings\nThere is no additional OneKeyCash just for booking through the mobile app.\n\nPrevious Expedia Rewards mobile promotions don't apply to One Key.\n\nFuture promotional offers may provide additional rewards.\n\nRedemption Bookings\nTravelers can earn trip elements on redemption bookings.\n\nThe booking portion must meet the applicable POSa qualification amount.\n\nOneKeyCash used for payment does not itself earn OneKeyCash.\n\nTAAP Agents\nTAAP agents do not earn One Key rewards on their agent account.\n\nThey may have a separate personal One Key account.\n\nPersonal accounts must only be used for personal travel.\n\nRounding Differences\nOneKeyCash shown during booking may differ slightly from the confirmation email.\n\nThis can happen because of local-currency conversion and rounding.\n\nThe confirmation email/Rewards Activity amount is the final amount.\n\nTier Status Not Updated\nCheck whether the completed booking qualifies and whether its confirmation period has passed.\n\nIf eligible but the tier hasn't updated, manually adjust the rewards/trip elements.\n\nFollow Loyalty | One Key | Adjust OneKeyCash and trip elements.\n\nNon-One Key POSa\nOne Key is only available in participating brands/regions.\n\nIf the traveler moves to a non-One Key POSa, the applicable legacy rewards program may apply.\n\nExample: Expedia Rewards or Hotels.com Rewards, depending on the brand/POSa.\n\nHotels.com Rewards\nIn regions where One Key replaced Hotels.com Rewards, travelers can't continue earning stamps/reward nights.\n\nExisting stamps/reward nights were converted to OneKeyCash.\n\nOne Key allows rewards across participating Expedia brands and multiple travel products.\n\nOneKeyCash Expiration\nEarned OneKeyCash generally doesn't expire if the traveler makes an eligible booking or redemption at least once every 18 months.\n\nPromotional OneKeyCash may have a shorter expiration period.\n\nAlways check the specific promotion terms.\n\nCurrency Conversion\nOneKeyCash can display in the local POSa currency when booking internationally.\n\nThe balance is converted using the exchange rate applicable on the booking date.\n\nRewards Activity shows the current balance and transaction details in account/local currencies.\n\nChanged Account Currency\nIf the traveler says their One Key account currency changed automatically, follow the Loyalty | One Key | Join and manage account process.\n\nCheck the “Good to Know” section for currency-management information.\n\nDon't assume the displayed local currency means their actual rewards balance changed."}, {"path": ["Calculate of onekey cash earned"], "text": "Policy / POSa\nCalculations shown apply to US and UK POSa; rates can vary by brand and POSa.\n\nBase price excludes taxes, fees, OneKeyCash, and coupons.\n\nCruises are eligible only on US and Canada POSa.\n\nHotels, Expedia Vacation Rentals, Activities, Cars & Cruises\nBlue 1% | Silver/Gold 2% | Platinum 3%.\n\nExample: $150 base price → Blue $1.50, Silver/Gold $3, Platinum $4.50.\n\nTrip elements are earned separately when the booking qualifies.\n\nVrbo Vacation Rentals\nBlue 0% | Silver 1% | Gold/Platinum 2%.\n\nExample: $150 base price → Silver $1.50, Gold/Platinum $3.\n\nBlue members don't earn OneKeyCash on these bookings.\n\nVIP Access Properties\nBlue 2% | Silver 3% | Gold 4% | Platinum 6%.\n\nExample: $150 base price → $3 / $4.50 / $6 / $9 respectively.\n\nThese higher rates apply specifically to VIP Access properties.\n\nCalculation Formula\nOneKeyCash = Base price × applicable earn rate.\n\nExample: $150 × 4% = $6 OneKeyCash.\n\nExclude taxes, fees, OneKeyCash, and coupon-paid amounts.\n\nExample: 3-Night VIP Access Hotel\n$150 total base price earns 3 trip elements because each night counts separately.\n\nOneKeyCash: Blue $3 | Silver $4.50 | Gold $6 | Platinum $9.\n\nTrip elements and OneKeyCash are calculated independently."}, {"path": ["Onekeycash redemption process"], "text": "Redeem OneKeyCash Online\nTravelers can redeem OneKeyCash themselves during checkout on participating brands.\n\nOn the payment screen, eligible bookings will show the option to apply OneKeyCash.\n\nEncourage self-service through the website or mobile app.\n\nRedeem Through an Agent\nLodging: Book in Voyager Classic, deduct the requested OneKeyCash in Voyager Next, then refund the equivalent amount in Voyager Classic.\n\nNon-lodging: Use BSA to book and apply OneKeyCash.\n\nUse the One Key adjustment process if help is needed.\n\nAutomatic OneKeyCash Redemption\nExpedia & Vrbo: OneKeyCash is automatically applied; traveler must turn it off if unwanted.\n\nHotels.com: OneKeyCash is not automatic; traveler must turn it on.\n\nExpedia: Traveler can adjust how much OneKeyCash to redeem.\n\nChanges to Redemption Bookings\nPenalty-free change to a cheaper booking → OneKeyCash is automatically refunded.\n\nMore expensive change → original OneKeyCash carries over; card pays the difference.\n\nAdditional OneKeyCash cannot cover the difference; cancel/rebook if needed.\n\nRefunds\nUsing the Refund button → OneKeyCash is automatically returned.\n\nOneKeyCash refunds/adjustments may take up to 72 hours to appear in Rewards Activity.\n\nCredit Button\nUsing Credit does not automatically return OneKeyCash.\n\nManually return the OneKeyCash using the One Key adjustment process.\n\nCancellations\nPenalty-free cancellation: OneKeyCash automatically returns.\n\nCancellation with penalty: OneKeyCash is not returned.\n\nIf the penalty is waived, OneKeyCash is automatically returned.\n\nPartial-Penalty Refund\nIf canceled within a penalty window, used OneKeyCash is not returned and no rewards are earned.\n\nIf the penalty is waived, OneKeyCash is automatically returned.\n\nForgot to Use OneKeyCash\nOneKeyCash cannot be added to an existing booking by changing the payment method.\n\nIf the booking is penalty-free, the traveler can cancel and rebook using OneKeyCash.\n\nRewards After Cancellation/Change\nCanceled portions don't earn rewards.\n\nOneKeyCash and trip elements are adjusted based on the final booking.\n\nTrip elements generally don't need manual adjustment for redemption-booking changes.\n\nOneKeyCash Adjustment Not Showing\nAdjustments are generally immediate but may take up to 24 hours to appear.\n\nCheck the Brand Site to confirm the adjustment was completed."}, {"path": ["Redmption rules"], "text": "General Redemption Rules\nBooking must be Pay Now and show the option to use OneKeyCash.\n\nOneKeyCash is not earned on the portion paid with OneKeyCash.\n\nIf OneKeyCash doesn't cover the full amount, the remaining balance must be paid by credit/debit card.\n\nHotels\nOneKeyCash can pay for Pay Now hotels + insurance.\n\nAvailability depends on the booking showing the redemption option.\n\nTaxes/fees may be covered depending on brand and POSa.\n\nVrbo\nOneKeyCash can pay for eligible Vrbo bookings.\n\nFor installment bookings, it can only be used toward the first payment.\n\nRedemption is not available on IPM bookings.\n\nCars\nOneKeyCash can pay for Pay Now standalone car rentals or Car + Insurance.\n\nThe booking must offer the OneKeyCash redemption option.\n\nRemaining balance must be paid by credit/debit card.\n\nActivities\nOneKeyCash can be used for Pay Now activities.\n\nThe booking must be eligible and display the redemption option.\n\nOneKeyCash isn't earned on the portion paid with OneKeyCash.\n\nPackages\nOneKeyCash can be used on select Pay Now packages.\n\nExpedia must be the Merchant of Record (MoR) for at least one component.\n\nMaximum redemption is limited to the value of the package components where Expedia is the MoR.\n\nTaxes & Fees\nOneKeyCash may cover taxes and fees for some brands/POSa.\n\nAlways check the POSa-specific policy.\n\nIf the redemption option isn't displayed, the booking isn't eligible.\n\nPayment Methods\nIf OneKeyCash doesn't cover the full booking, the remainder must be paid by credit/debit card.\n\nPayPal, Google Pay, Klarna, Cash App, Affirm, and Afterpay cannot be used for the remaining balance.\n\nPrice Drop Protection\nTravelers can use OneKeyCash to purchase Price Drop Protection when the flight redemption is eligible.\n\nEligibility depends on factors such as sufficient OneKeyCash and the airline.\n\nThis is separate from using OneKeyCash for the flight itself.\n\nOneKeyCash + Coupons\nExpedia: Promotional coupons and OneKeyCash can be used together.\n\nOneKeyCash is earned only on the amount paid by card and not covered by OneKeyCash/coupon.\n\nHotels.com and Vrbo: Promotional coupons and OneKeyCash cannot be combined."}, {"path": ["Legacy conversion"], "text": "One Key Migration\nOnly eligible activity from participating brands/POSa counts toward One Key tier status.\n\nFor Expedia POSa outside US/UK that joined in 2025, the higher of eligible 2024 activity vs. 2025 activity before joining determined the starting tier.\n\nIf no eligible activity exists, the traveler starts at Blue.\n\nMigration Tier Duration\nFor Expedia travelers who migrated in 2025, the assigned tier remains active through February 28, 2027.\n\nMatching email addresses are required when combining activity from multiple participating brands/POSa.\n\nPreviously manually awarded tier status is retained at minimum.\n\nExpedia Rewards Points Conversion\n100 Expedia Rewards points = $1 OneKeyCash with no loss of value.\n\nExample: 1,250 points = $12.50 OneKeyCash.\n\nThe original points expiration date is retained, subject to the migration rules.\n\nHotels.com Reward Nights\nApplies to US and UK.\n\nReward nights were converted to OneKeyCash at their full value.\n\nExample: a $125 reward night = $125 OneKeyCash.\n\nHotels.com Reward Stamps\nApplies to US and UK.\n\nEach stamp was converted at 10% of its value, because 10 stamps previously earned a reward night.\n\nExample: a $125 stamp = $12.50 OneKeyCash.\n\nHotels.com Expiration\nConverted stamps/reward nights retain their original expiration date.\n\nHotels.com Rewards generally expired 12 months after the last eligible activity.\n\nIf converted Expedia points had a later expiration date, the later date could apply.\n\nVrbo Migration\nVrbo had no previous loyalty program, so there were no legacy rewards to convert.\n\nTravelers began earning OneKeyCash on eligible bookings after joining One Key.\n\nThis applies across Vrbo and heritage-brand markets.\n\nPending Rewards During Migration\nUS/UK: Eligible bookings completed after joining One Key earn at One Key rates.\n\nOutside US/UK: Pre-One-Key bookings generally retain the legacy rate, even if completed after joining.\n\nChanges made after One Key launches can cause the booking to earn under the new One Key rate.\n\nTraveler Says Rewards Were Migrated Incorrectly\nCheck the traveler's Voyager Next loyalty section for converted OneKeyCash.\n\nIf a specific booking/reward is missing, follow the legacy rewards conversion error process.\n\nFor a full migration reconciliation, Tier 3 can email Rewards Support using the Rewards Migration Research template.\n\nGuest Bookings / Missing Legacy Rewards\nMigration only included rewards attached to the traveler's account.\n\nGuest-account bookings were not included automatically.\n\nFollow the Research legacy rewards conversion errors process for these cases.\n\nOne Key Not Available on Another POSa\nExpedia: Accounts are POSa-specific; rewards remain on a POSa until One Key launches there.\n\nHotels.com: Rewards accounts are global, but conversion depends on the account's Preferred POSa.\n\nTravelers can continue using the applicable legacy rewards program where One Key hasn't launched."}, {"path": ["Promotional onekeycash"], "text": "Travel-Earned OneKeyCash\nExpires after 18 months.\n\nPromotional OneKeyCash\nExpires on the date stated in the promotion.\n\nExpires at 11:59 PM PST.\n\nCheck Promotional Balance\nOneDesk: Traveler Account → Loyalty.\n\nVoyager Next: History → Loyalty.\n\nCheck Rewards Activity for specific promotion details.\n\nMissing Promotional Reward\nConfirm the promotion and whether it was claimed/gifted.\n\nIf confirmed missing, manually award the promotional OneKeyCash.\n\nExpired Promotional Reward\nConfirm “Expired Promotional OKC” in Loyalty History.\n\nYou may reinstate the same amount once as a gift.\n\nReason: Other; note: Reinstating Expired Promotional OneKeyCash.\n\nCancellation\nPromotional OneKeyCash is returned after cancellation.\n\nOriginal expiration date remains unchanged.\n\nUsing OneKeyCash\nThe system uses the balance expiring soonest first.\n\nPartial use does not extend the remaining balance's expiration.\n\nImportant\nPromotional OneKeyCash does not extend the 18-month expiration of travel-earned OneKeyCash."}, {"path": ["VIP Access"], "text": "VIP Access\nVIP Access = selected hotels with high quality and service standards.\n\nLook for the VIP1 icon on the website/Voyager.\n\nAgent Tools may not show VIP status.\n\nVIP Benefits\nSilver, Gold & Platinum can receive perks such as Wi-Fi and breakfast.\n\nGold & Platinum: room upgrades, early check-in, and late checkout when available.\n\nExact perks vary by hotel and are shown in the itinerary/confirmation.\n\nExclusive Gold/Platinum Perk\nIf the traveler doesn't receive the listed perk, apologize and provide the applicable compensation.\n\nOne Key POSa: compensation = OneKeyCash.\n\nNon-One Key POSa: compensation = coupon.\n\nReport Missing Perk\nEmail VIP_perk@expediagroup.com internally with itinerary, hotel, traveler, issue, and compensation provided.\n\nDo not give the email address to the traveler.\n\nRoom Upgrade\nUpgrade is subject to availability.\n\nBefore arrival: traveler can request it at check-in; agents can also contact the hotel.\n\nIf unavailable, ask whether a better-location room is available.\n\nVIP Cancellation\nIf a VIP booking is canceled, the traveler must rebook with Expedia Group to receive VIP perks again.\n\nVIP perks do not automatically transfer to a new booking."}, {"path": ["Trip elemnts adjusment"], "text": "Before Adjusting\nResearch first and confirm the booking is eligible.\n\nAdjust rewards only after travel is completed.\n\nDon't submit a second adjustment until you've checked Voyager Next, OneDesk, and BSA and refreshed.\n\nAdjustment Limits\nOver your tool limit → use the appropriate adjustment-limit email template.\n\nPremium/Tier 3 can make multiple transactions, but the total must not exceed $1,000.\n\nDon't transfer a case just because one transaction exceeds the limit.\n\nOneDesk Process\nLoyalty → Adjust loyalty → select case.\n\nChoose adjustment type, reward type, add/deduct, reason, amount, and notes.\n\nComplete the adjustment and refresh Loyalty History to verify.\n\nVoyager Next Process\nVirtual Agent → Manage Rewards → Adjust Rewards.\n\nChoose add/deduct, reason, amount, cause, and notes.\n\nComplete and refresh Loyalty History to verify.\n\nAccount-Level Adjustment\nUse when rewards need to be added directly to the traveler's account, such as:\n\nGuest booking with missing rewards.\n\nCanceled booking where rewards need to be issued.\n\nBooking missing from the carousel but found in Voyager Classic.\n\nRewards still missing after the confirmation period.\n\nEligible cruise rewards.\n\nBooking fully paid with OneKeyCash.\n\nTool error prevents issuing rewards to the booking.\n\nImportant\nAccount-level OneKeyCash adjustments must use the traveler's rewards account currency.\n\nAccount-level adjustments post immediately.\n\nBooking-level adjustments may remain pending until the earn confirmation timeframe."}, {"path": ["Gift cards"], "text": "Basic Rules\nAvailable in US, CA, UK, SE, AU; customers can use them online only, not by phone.\n\nValid for Pay Now hotel bookings only; not packages or car rentals. No gift-card usage fees.\n\nCan combine with another payment method and eligible bookings can earn Hotels.com Rewards.\n\nGift cards can be transferred to another customer and used immediately; no need to notify us.\n\nCannot be reloaded, replaced if lost/stolen/damaged, or returned.\n\nGift Card Values & Expiration\nUS/CA: $10–$2,000 USD/CAD; no expiration, but deactivate after 3 years while retaining the full value.\n\nUK: £10–£1,350; expires 3 years after activation.\n\nSE: 90–14,500 SEK; expires 3 years after activation.\n\nAU: $10–$2,500 AUD; expires 3 years after activation.\n\nUp to 5 cards can be merged for US, CA, UK, SE; AU cannot be merged.\n\nBalance / Merge\nCustomers can check balances or request eligible card merges through the Hotels.com gift-card service.\n\nGift cards can come from Hotels.com websites, B2B distributors, rewards/incentive programs, banks, and retail stores.\n\nE-gift cards are generally delivered within 1 hour; US/CA physical cards generally take 7–10 days.\n\nHow Customers Redeem\nWebsite/app → choose an eligible Pay Now hotel → select Gift Card as payment → enter card number + PIN.\n\nWebsite search can use the Pay with Hotels.com gift card filter.\n\nPay Later bookings do not offer gift-card payment.\n\nIf the Gift Card option is unavailable, customer must select another hotel.\n\nAgents should encourage self-service; if needed, send an event-driven email with reservation details or guide the customer through the online process.\n\nChanging / Canceling a Gift-Card Booking\nRefund goes automatically to a new gift card.\n\nIf gift card + another payment method was used, the gift-card portion returns to a new gift card and the remaining refund goes to the other payment method.\n\nNew gift card is normally emailed within 4 hours.\n\nCustomer cannot rebook using the refunded amount until they receive the new gift-card email.\n\nWrong Customer Email\nVerify the email address.\n\nIf incorrect, email giftcards@hotels.com with:\n\nCustomer name\n\nEmail used for booking\n\nCorrect email\n\nItinerary number\n\nCancellation date\n\nOriginal gift-card number\n\nGift-card value/currency\n\nIssue description\n\nCustomer Didn't Receive New Gift Card\nCheck Voyager → Billing History.\n\nIf refund shows successful, follow the gift-card FAQ/support process.\n\nIf refund is pending/failed, do not refund the original card or another payment method.\n\nEmail giftcards@hotels.com with customer name/email, itinerary, cancellation date, original card number, value/currency, and issue description.\n\nFailed Gift-Card Refund\nNever attempt another payment-method refund.\n\nEmail giftcards@hotels.com with the complete case details.\n\nTell the traveler the request has been forwarded to the gift-card team and should be resolved within 72 hours.\n\nIf they ask to be transferred, explain the team is offline and unavailable for live assistance.\n\nCommon Gift-Card Issues\nCheckout error: Possible causes include incorrect card/PIN attempts or site issues. Customer can contact the gift-card team or the number on the back of the card.\n\nHotels.com/GiftCard purchase/resend/receipt: Contact the applicable gift-card support number and provide name, mailing address, phone, value/currency, last 4 digits of payment card, and issue.\n\nOther redemption/balance questions: Email giftcards@hotels.com with name, email, card number/value/currency, proof of purchase, and issue.\n\nLost/stolen card: If funds remain, place a fraud hold immediately using the applicable country number, then email the gift-card team with customer details, card photo/screenshot, purchase source, value/currency, receipt/email confirmation, and issue.\n\nGift-card investigations for lost/stolen cases generally take 24–48 hours.\n\nFraud / Scams / Theft\nTreat gift cards like cash; Hotels.com is generally not liable for lost/stolen cards.\n\nDo not promise cash refunds or replacement cards.\n\nGift-card team investigates card history and redemptions case by case.\n\nIf funds can be recovered, a replacement may be considered.\n\nDo not refund the original card or another payment method; send the case to giftcards@hotels.com.\n\nRewards\nEligible gift-card hotel bookings can still earn Hotels.com Rewards stamps.\n\nNormal booking eligibility requirements still apply.\n\nImportant Agent Contacts\nGift-card support: giftcards@hotels.com — external team; do not provide the email to travelers.\n\nVIP Access issues: VIP_perk@expediagroup.com — internal; do not provide to travelers.\n\nOneKey migration research: rewardssupport@expediagroup.com — internal; do not provide to travelers.\n\nKey Agent Rule\nResearch first → check Voyager/Billing History → collect all required details → use the correct escalation path → never promise a refund/replacement that the policy does not authorize."}]}], "issues": [{"cat": "Problem with room or hotel condition", "issue": "Bad smell in hotel or room", "pct": 0.1}, {"cat": "Problem with room or hotel condition", "issue": "Not enough bedding", "pct": 0.1}, {"cat": "Problem with room or hotel condition", "issue": "Cosmetic damage to building", "pct": 0.1}, {"cat": "Problem with room or hotel condition", "issue": "Mold on walls or windows", "pct": 0.1}, {"cat": "Problem with room or hotel condition", "issue": "Dirty room or hotel", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "Bugs or other pests", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "Broken glass on floor (small amount)", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "Broken door locks", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "No hot water in bath / shower", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "No electricity", "pct": 0.15}, {"cat": "Problem with room or hotel condition", "issue": "Elevators don't work", "pct": 0.15}, {"cat": "Problem with hotel service or our service", "issue": "Construction in the area around hotel (not mentioned)", "pct": 0.1}, {"cat": "Problem with hotel service or our service", "issue": "Hotel staff is not helpful", "pct": 0.1}, {"cat": "Problem with hotel service or our service", "issue": "Agent was rude", "pct": 0.1}, {"cat": "Problem with hotel service or our service", "issue": "Construction at the hotel (not mentioned)", "pct": 0.15}, {"cat": "Problem with hotel service or our service", "issue": "Unexpected loud noise at night", "pct": 0.15}, {"cat": "Problem with hotel service or our service", "issue": "Hotel staff is rude", "pct": 0.15}, {"cat": "Problem with hotel service or our service", "issue": "Hotel staff enters guest's room without permission", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "No balcony as advertised", "pct": 0.1}, {"cat": "Hotel/room not as advertised or booked", "issue": "Smaller than advertised", "pct": 0.1}, {"cat": "Hotel/room not as advertised or booked", "issue": "One-star rating difference (3 stars instead of 4)", "pct": 0.1}, {"cat": "Hotel/room not as advertised or booked", "issue": "Guesthouse or B&B instead of hotel", "pct": 0.1}, {"cat": "Hotel/room not as advertised or booked", "issue": "Single room instead of double", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "No view as advertised", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "Confirmed request for adjoining rooms not met", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "Two-star rating difference (3 stars instead of 5)", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "Hostel instead of hotel", "pct": 0.15}, {"cat": "Hotel/room not as advertised or booked", "issue": "Not given an accessible room", "pct": 0.15}, {"cat": "Problems checking in", "issue": "No one at the front desk", "pct": 0.1}, {"cat": "Problems checking in", "issue": "Hotel can't find the reservation", "pct": 0.1}, {"cat": "Problems checking in", "issue": "Very long wait lines", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "TV doesn't work or only local channels", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "Phone doesn't work", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "Internet connection slow or not available", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "Hotel activities/entertainment options not as advertised", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "Food offerings not as advertised (other options available)", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "No air conditioning in hotel common areas", "pct": 0.05}, {"cat": "Problem with amenities", "issue": "No private bathroom, or toilet / sink / shower as advertised", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No additional beds, as requested or advertised", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No swimming pool as advertised", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No food as advertised, and no alternative options", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No activities as advertised", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No beach access or view as advertised", "pct": 0.1}, {"cat": "Problem with amenities", "issue": "No air conditioning in the room", "pct": 0.1}, {"cat": "Problem with payment", "issue": "Unauthorized charges from hotel", "pct": 0.05}, {"cat": "Problem with payment", "issue": "Unexpected pre-authorization charges", "pct": 0.05}, {"cat": "Premium/Elite Rewards", "issue": "Room upgrade / amenity / perk not provided as promised", "pct": 0.05}]}</script>
+
+<script>
+const D=JSON.parse(document.getElementById('d').textContent),P=D.products,R=document.documentElement,$=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+const short=n=>n.replace(/\s*\(.*\)\s*$/,''),IC={hotel:'🏨','nps boosters':'⭐',cars:'🚗',insurance:'🛡️',activity:'🎟️',loyalty:'🎁'},icon=n=>IC[short(n).toLowerCase()]||'📋';
+const AC=[['blue','#2f6bff','#5b5bf0'],['violet','#7048e8','#a23de0'],['emerald','#0b8a55','#0a8f8f'],['sunset','#d9480f','#e8590c'],['yellow','#e6a100','#f59f00']];
+const ST={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const isDark=()=>R.dataset.theme?R.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+
+const ctl=()=>{$('scn').textContent=SC[sc]?SC[sc][1]:'🚫';$('scn').title='Background: '+(SC[sc]?SC[sc][0]:'Off');$('mode').textContent=isDark()?'☀️':'🌙';document.querySelectorAll('.dot').forEach(d=>d.classList.toggle('on',d.dataset.a===(R.dataset.a||'blue')))};
+
+const W=1200,H=800,rg=s=>()=>(s=s*16807%2147483647)/2147483647;
+const P1=(d,c,o)=>'<path class="'+c+'" opacity="'+o+'" d="'+d+'Z"/>';
+const city=(s,b,lo,hi,c,o)=>{const r=rg(s);let x=-20,d='M-20 '+H;while(x<W+20){const w=40+r()*70,t=b-lo-r()*(hi-lo);d+='V'+t+'H'+(x+w)+'V'+H+'H'+(x+w+3);x+=w+3}return P1(d,c,o)};
+const ridge=(s,b,a,c,o)=>{const r=rg(s);let d='M0 '+H+'V'+b,i=0;for(let x=0;x<=W+70;x+=70,i++)d+='L'+x+' '+(b-(i%2?r()*a*.35:a*(.4+.6*r())));return P1(d,c,o)};
+const wave=(y,a,l,p,c,o)=>{let d='M0 '+H+'V'+y;for(let x=0;x<=W;x+=20)d+='L'+x+' '+(y+Math.sin(x/l+p)*a);return P1(d,c,o)};
+const circ=(x,y,r,c,o)=>'<circle cx="'+x+'" cy="'+y+'" r="'+r+'" class="'+c+'" opacity="'+o+'"/>';
+const stars=()=>{const r=rg(50021);let s='';for(let i=0;i<90;i++)s+=circ(r()*W|0,r()*480|0,(.8+r()*1.6).toFixed(1),'sc',(.15+r()*.45).toFixed(2));return s};
+const balloon=(x,y,k,c,o)=>'<g transform="translate('+x+' '+y+') scale('+k+')"><g class="bl"><ellipse rx="32" ry="40" class="'+c+'" opacity="'+o+'"/><ellipse rx="11" ry="40" class="sc" opacity="'+o/3+'"/><path d="M-17 34L-9 58H9L17 34Z" class="'+c+'" opacity="'+o+'"/><rect x="-8" y="58" width="16" height="11" class="sc" opacity="'+o+'"/></g></g>';
+
+const SC=[
+['City','🏙️',()=>circ(930,250,70,'sb',.16)+city(70123,690,120,330,'sb',.15)+city(30457,760,60,230,'sa',.22)],
+['Beach','🏖️',()=>circ(820,560,190,'sb',.10)+circ(820,560,120,'sb',.28)+wave(610,10,70,0,'sb',.16)+wave(670,14,90,1.5,'sa',.2)+wave(735,18,110,3,'sa',.28)],
+['Mountains','🏔️',()=>circ(300,250,60,'sb',.2)+ridge(11033,540,300,'sb',.14)+ridge(50077,630,260,'sa',.2)+ridge(90019,720,200,'sa',.3)],
+['Night sky','🌌',()=>stars()+'<mask id="mm"><rect width="1200" height="800" fill="#fff"/><circle cx="262" cy="170" r="42" fill="#000"/></mask><circle cx="240" cy="180" r="48" class="sb" opacity=".6" mask="url(#mm)"/>'+ridge(40013,720,150,'sa',.22)],
+['Balloons','🎈',()=>balloon(220,300,1.7,'sb',.28)+balloon(560,200,1.1,'sa',.26)+balloon(900,360,2,'sa',.22)+balloon(1080,170,.9,'sb',.3)+balloon(400,520,.8,'sa',.2)+ridge(20011,740,110,'sa',.22)]
+];
+
+let sc=+ST.get('lhd-scene');if(!(sc>=0&&sc<=SC.length))sc=0;
+const scene=()=>{$('scene').innerHTML=SC[sc]?'<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">'+SC[sc][2]()+'</svg>':''};
+
+let tab=0,sel=[],q='';
+
+const opts=(p,i)=>{const o=[];p.entries.forEach(e=>{if(sel.slice(0,i).every((v,k)=>e.path[k]===v)&&!o.includes(e.path[i]))o.push(e.path[i])});return o};
+function fix(p){for(let i=0;i<p.levels.length;i++){const o=opts(p,i);if(!o.includes(sel[i])){sel.length=i;if(o.length==1)sel[i]=o[0]}if(sel[i]===undefined)break}}
+
+/* Modal Popup Reminder Flows */
+let npsIndex = 0;
+function showNpsModalSequence(onComplete) {
+  const npsProd = P.find(x => x.name === "NPS Boosters");
+  if (!npsProd || !npsProd.entries.length) {
+    onComplete();
+    return;
+  }
+  npsIndex = 0;
+  
+  function renderStep() {
+    const entry = npsProd.entries[npsIndex];
+    if (!entry) {
+      $('modalContainer').innerHTML = '';
+      onComplete();
+      return;
+    }
+    const html = `
+      <div class="modal-overlay">
+        <div class="modal-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span class="pill">⭐ NPS Booster Reminder (${npsIndex + 1} of ${npsProd.entries.length})</span>
+            <span style="font-size:12px; color:var(--mu); font-weight:bold;">Important Policy</span>
+          </div>
+          <h3 style="margin:0 0 10px; font-size:18px;">${esc(entry.path.join(' › '))}</h3>
+          <div class="txt" style="margin-bottom:20px;">${fmt(entry.text)}</div>
+          <button id="npsAckBtn" class="chip on" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
+            ✓ Acknowledged & Next
+          </button>
+        </div>
+      </div>
+    `;
+    $('modalContainer').innerHTML = html;
+    $('npsAckBtn').onclick = () => {
+      npsIndex++;
+      renderStep();
+    };
+  }
+  renderStep();
+}
+
+function showActivityModal(onComplete) {
+  const html = `
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span class="pill">🎟️ Activity Booking Reminder</span>
+          <span style="font-size:12px; color:var(--mu); font-weight:bold;">System Flow</span>
+        </div>
+        <h3 style="margin:0 0 10px; font-size:18px;">Important Acknowledgment</h3>
+        <div class="txt" style="margin-bottom:20px; font-size:15px; font-weight:600;">
+          Kindly be aware that to serve Activity booking You have to go through BSA first.
+        </div>
+        <button id="actAckBtn" class="chip on" style="width:100%; justify-content:center; padding:12px; font-weight:700;">
+          ✓ Acknowledged
+        </button>
+      </div>
+    </div>
+  `;
+  $('modalContainer').innerHTML = html;
+  $('actAckBtn').onclick = () => {
+    $('modalContainer').innerHTML = '';
+    onComplete();
+  };
+}
+
+
+let twZ=10002,twN=0;
+function openToolModal(toolType,nid) {
+  if(toolType==='n'){const ids=Object.keys(NT).sort((a,b)=>a-b);nid=nid||ids.find(i=>!document.querySelector('.tool-win[data-tt="n'+i+'"]'))||ids[0]||'1';if(!(nid in NT)){NT[nid]='';svNT()}}
+  const TT={c:['🧮 OKC Calculator',calcHtml,initCalc],tr:['⏱️ Chat Timer',tkHtml,initTK],e:['🚨 Escalation Checker',escHtml,initEsc],sh:['🛠️ Shift Tools',shHtml,initSH],ss:['📊 Shift Summary',ssHtml,initSS],n:['📝 Note '+nid,noteHtml,w=>initNote(w,nid)]}[toolType],title=TT[0],tt=toolType==='n'?'n'+nid:toolType;
+  if(toolType!=='c'&&toolType!=='tr'){const ex=document.querySelector('.tool-win[data-tt="'+tt+'"]');if(ex){ex.style.display='';if(ex._dk)ex._dk.remove();ex.style.zIndex=++twZ;$('leftSidebar').classList.remove('open');return}}
+  const win = document.createElement('div');
+  win.className = 'tool-win';win.dataset.tt=tt;
+  win.innerHTML = '<div class="tw-head"><h3 class="tw-title">'+title+'</h3><span style="display:flex;gap:6px"><button type="button" class="chip tw-m" aria-label="Minimize" title="Minimize">—</button><button type="button" class="chip tw-x" aria-label="Close">✕</button></span></div><div class="tw-body">'+TT[1]()+'</div>';
+  const off = (twN++ % 8) * 28;
+  win.style.left = Math.max(8, Math.min(window.innerWidth - 436, (window.innerWidth - 420) / 2 + off)) + 'px';
+  win.style.top = (70 + off) + 'px';
+  win.style.zIndex = ++twZ;
+  $('toolWindows').appendChild(win);
+
+  TT[2](win);
+
+  const front = () => { win.style.zIndex = ++twZ; };
+  win.addEventListener('pointerdown', front);
+  win.querySelector('.tw-m').onclick=()=>{win.style.display='none';const d=document.createElement('button');d.className='chip';d.type='button';d.textContent=title;d.onclick=()=>{win.style.display='';win.style.zIndex=++twZ;d.remove()};win._dk=d;$('dock').appendChild(d)};
+  win.querySelector('.tw-x').onclick = () => { win.remove(); if(win._dk)win._dk.remove(); tkUpdate(); };
+
+  // drag anywhere on screen by the title bar
+  const head = win.querySelector('.tw-head');
+  head.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    const r = win.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+    head.setPointerCapture(e.pointerId);
+    const mv = ev => {
+      const x = Math.min(Math.max(ev.clientX - dx, 40 - r.width), window.innerWidth - 40);
+      const y = Math.min(Math.max(ev.clientY - dy, 0), window.innerHeight - 40);
+      win.style.left = x + 'px'; win.style.top = y + 'px';
+    };
+    const up = () => { head.removeEventListener('pointermove', mv); head.removeEventListener('pointerup', up); head.removeEventListener('pointercancel', up); };
+    head.addEventListener('pointermove', mv); head.addEventListener('pointerup', up); head.addEventListener('pointercancel', up);
+  });
+
+  // Close left sidebar when a tool is opened
+  $('leftSidebar').classList.remove('open');
+}
+
+function handleTabClick(targetTab) {
+  if (targetTab === 0) { // 0 is Hotels tab index
+    showNpsModalSequence(() => {
+      tab = 0;
+      sel = [];
+      render();
+    });
+  } else if (typeof targetTab === 'number' && P[targetTab] && P[targetTab].name.toLowerCase() === 'activity') {
+    showActivityModal(() => {
+      tab = targetTab;
+      sel = [];
+      render();
+    });
+  } else {
+    tab = targetTab;
+    sel = [];
+    render();
+  }
+}
+
+function render(){
+ const m=$('main');
+ if(q.trim().length>1){
+  const tk=q.trim().toLowerCase().split(/\s+/).filter(Boolean),re=new RegExp('('+tk.map(w=>esc(w).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi'),h=[];
+  P.forEach((p,pi)=>p.entries.forEach((e,ei)=>{const hd=(p.name+' '+e.path.join(' ')).toLowerCase(),tx=e.text.toLowerCase();let s2=0;for(const w of tk){const a=hd.includes(w),b=tx.includes(w);if(!a&&!b){s2=-1;break}s2+=(a?5:0)+(b?1:0)}if(s2>0)h.push([pi,ei,s2])}));
+  h.sort((x,y)=>y[2]-x[2]);
+  m.innerHTML='<div class="mu" style="margin:14px 2px 0">'+h.length+(h.length==1?' match':' matches')+(h.length>30?' (showing 30)':'')+'</div>'+(h.length?'':'<div class="hint">No results. Try fewer or different words.</div>')+h.slice(0,30).map(([pi,ei])=>{const e=P[pi].entries[ei],t=e.text.replace(/\s+/g,' '),lt=t.toLowerCase(),ix=tk.map(w=>lt.indexOf(w)).filter(x=>x>=0).sort((a,b)=>a-b),i=ix.length?ix[0]:-1,sn=i<0?t.slice(0,140):t.slice(Math.max(0,i-50),i+110),hl=x=>esc(x).replace(re,y=>'<mark>'+y+'</mark>');
+   return '<button class="card hit" data-p="'+pi+'" data-e="'+ei+'"><span class="pill">'+icon(P[pi].name)+' '+esc(short(P[pi].name))+'</span> <b>'+hl(e.path.join(' › '))+'</b><div class="mu" style="margin-top:6px">…'+hl(sn)+'…</div></button>'}).join('');
+  return}
+
+ let h='<div class="tabs">'+P.map((p,i)=>'<button class="tab'+(tab===i?' on':'')+'" data-t="'+i+'"><span>'+icon(p.name)+'</span>'+esc(short(p.name))+'</button>').join('')+'</div>';
+
+
+ h+=favHtml();const p=P[tab];fix(p);
+ h+='<div class="mu" style="margin:4px 2px 0"><b>'+esc(p.name)+'</b> · '+p.entries.length+' processes</div>';
+ for(let i=0;i<p.levels.length;i++){
+  if(i>0&&sel[i-1]===undefined)break;
+  h+='<div class="lbl"><span class="n">'+(i+1)+'</span>'+esc(p.levels[i])+'</div><div class="row">'+opts(p,i).map((o,j)=>'<button class="chip'+(sel[i]===o?' on':'')+'" data-l="'+i+'" data-j="'+j+'">'+esc(o)+'</button>').join('')+'</div>'}
+ const e=sel.length===p.levels.length&&p.entries.find(e=>e.path.every((v,k)=>v===sel[k]));
+ const ei=e?p.entries.indexOf(e):-1;if(e)rec(tab+':'+ei);
+ h+=e?'<div class="card res"><span class="pill">'+esc(sel.join(' › '))+'</span><div class="txt">'+fmt(e.text)+'</div><button class="chip cp">📋 Copy</button> <button class="chip" data-fav="'+tab+':'+ei+'">'+(FAV.includes(tab+':'+ei)?'⭐ Saved':'☆ Save')+'</button></div>':'<div class="hint">Choose an option above to reveal the process.</div>';
+ m.innerHTML=h}
+
+function calcHtml(){
+ const cats=[...new Set(D.issues.map(x=>x.cat))];
+ return '<div class="card"><div class="lbl">Booking amount (USD)</div><div class="fld amt"><span>$</span><input data-r="amt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div><div class="lbl">Compensation category / issue</div><div class="fld"><select data-r="iss"><option value="">Select an issue…</option>'+
+ cats.map(c=>'<optgroup label="'+esc(c)+'">'+D.issues.map((x,i)=>x.cat===c?'<option value="'+i+'">'+esc(x.issue)+' ('+Math.round(x.pct*100)+'%)</option>':'').join('')+'</optgroup>').join('')+'</select></div></div><div data-r="out"></div><div data-r="ch"></div>'}
+
+function initCalc(root){
+ const q1=n=>root.querySelector('[data-r="'+n+'"]'),a=q1('amt'),s=q1('iss'),o=q1('out'),f=(n,d)=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+ const go=()=>{
+  const amt=parseFloat(a.value)||0;
+  if(s.value===''||amt<=0){o.innerHTML='<div class="hint">Enter the booking amount and pick an issue to calculate.</div>';return}
+  const x=D.issues[+s.value],pc=Math.round(x.pct*100)+'%',raw=amt*x.pct,r=Math.ceil(Math.round(raw*1e8)/1e8/25)*25;
+  const msg='The percentage for that reason is '+pc+' which is '+f(raw,2)+' USD, upgraded to the nearest 25 which will be '+f(r,0)+' USD. Kindly proceed with adding them as OKC.';
+  o.innerHTML='<div class="card res"><div class="stats"><div class="st"><span class="mu">Compensation</span><b>'+pc+'</b></div><div class="st"><span class="mu">Raw amount</span><b>'+f(raw,2)+'</b></div><div class="st big"><span class="mu">Rounded to nearest $25</span><b>'+f(r,0)+'</b></div></div><div class="txt">'+esc(msg)+'</div><button class="chip cp">📋 Copy message</button><button class="chip" data-lg="1" style="margin-left:6px">➕ Log</button></div>';o.querySelector('[data-lg]').onclick=()=>{CH.unshift({t:Date.now(),a:amt,i:x.issue,r,m:msg});CH=CH.slice(0,30);ST.set('pb-ch',JSON.stringify(CH));chUpd()}};
+ a.oninput=go;s.onchange=go;go();chUpd()}
+
+function legacy(t){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}
+
+document.addEventListener('click',ev=>{
+ const b=ev.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.fav!==undefined){toggleFav(d.fav);render()}
+ else if(d.tool!==undefined){
+   openToolModal(d.tool);
+ }
+ else if(d.t!==undefined){
+   handleTabClick(+d.t);
+ }
+ else if(d.l!==undefined){const i=+d.l;sel.length=i;sel[i]=opts(P[tab],i)[+d.j];render()}
+ else if(d.p!==undefined){tab=+d.p;sel=P[tab].entries[+d.e].path.slice();q='';$('q').value='';render()}
+ else if(d.a!==undefined){R.dataset.a=d.a;ST.set('lhd-acc',d.a);ctl()}
+ else if(b.id==='mode'){R.dataset.theme=isDark()?'light':'dark';ST.set('lhd-mode',R.dataset.theme);ctl()}
+ else if(b.id==='scn'){sc=(sc+1)%(SC.length+1);ST.set('lhd-scene',sc);scene();ctl()}
+ else if(b.id==='sidebarToggle'){
+   const sb = $('leftSidebar');
+   sb.classList.toggle('open');
+ }
+ else if(b.classList.contains('cp')){const t=b.parentElement.querySelector('.txt').innerText,o=b.textContent,ok=()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1600)};
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok,()=>{legacy(t);ok()})}
+});
+
+$('q').oninput=e=>{q=e.target.value;render()};
+$('dots').innerHTML=AC.map(a=>'<button class="dot" data-a="'+a[0]+'" title="'+a[0]+'" aria-label="'+a[0]+' theme" style="background:linear-gradient(135deg,'+a[1]+','+a[2]+')"></button>').join('');
+
+const sm=ST.get('lhd-mode'),sa=ST.get('lhd-acc');
+if(sm==='dark'||sm==='light')R.dataset.theme=sm;
+if(AC.some(a=>a[0]===sa))R.dataset.a=sa;
+try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',ctl)}catch(e){}
+
+const TOOLS=[['🧮','OKC Calculator','tool:c'],['⏱️','Chat Timer','tool:tr'],['🚨','Escalation Checker','tool:e'],['🛠️','Shift Tools','tool:sh'],['📊','Shift Summary','tool:ss'],['📝','Notes','tool:n'],['☁️','Salesforce','https://traveler.lightning.force.com/lightning/r/Report/00OVs00000Mln0bMAB/edit?queryScope=userFolders'],['📚','Runway Knowledge','https://traveler.my.site.com/Runway/s/?language=en_US'],['🧭','BSA','https://www.expedia.com/bsa/home'],['🚀','Voyager Classic','https://vap-expediagroup.okta.com/sso/saml2/0oa12vgwonLUbbv1j357'],['🖥️','Console','https://console.vap.expedia.com/dashboard'],['📊','Tableau','https://expedia-tableau-external.sea.corp.expecn.com/#/?:isFromSaml=y'],['💬','VNext','https://agent.vap.expedia.com/channel'],['📞','TP IEX','https://tp-eg.nicecloudsvc.com/'],['🗂️','BMS','https://www.sebra.ccms.teleperformance.com/ccms-bin/home.pl'],['✉️','Webmail','https://webmail.emea.teleperformance.com/'],['🔐','OKTA','https://ext-expediagroup.okta.com/app/UserHome']];
+
+// Render persistent embedded tools in the left sidebar
+
+
+const TK={s:[{a:0,b:0},{a:0,b:0}],iv:null};
+try{const x=JSON.parse(ST.get('lhd-trk')||'null');if(Array.isArray(x)&&x.length===2)TK.s=x.map(o=>({a:+o.a||0,b:+o.b||0}))}catch(e){}
+const tkSave=()=>ST.set('lhd-trk',JSON.stringify(TK.s));
+const hms=ms=>{const t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=t%60,p=n=>String(n).padStart(2,'0');return(h?p(h)+':':'')+p(m)+':'+p(s)};
+function tkCard(i){return '<div class="card"><div class="lbl">💬 '+(i?'Second chat session':'Chat session 1')+' <span class="pill" data-r="tp'+i+'">Idle</span></div><div class="clk" data-r="tc'+i+'">00:00</div><div class="mu" data-r="tn'+i+'">Press start when the chat begins.</div><div class="vr" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap"><button class="chip on" data-k="s'+i+'" type="button">▶️ '+(i?'Start second session':'Start session')+'</button><button class="chip" data-k="e'+i+'" type="button">⏹️ Chat ended</button><button class="chip" data-k="c'+i+'" type="button">📋 Copy duration</button><button class="chip" data-k="r'+i+'" type="button">↺ Reset</button></div></div>'}
+function tkHtml(){return tkSum()+tkCard(0)+tkCard(1)}
+
+function tkUpdate(){
+ let any=false;
+ TK.s.forEach((x,i)=>{const cs=document.querySelectorAll('[data-r="tc'+i+'"]');if(!cs.length)return;any=true;
+  const run=x.a>0&&!x.b,end=x.a>0&&x.b>0,idle=!x.a;
+  cs.forEach(c=>{c.textContent=hms(idle?0:(end?x.b-x.a:Date.now()-x.a));c.classList.toggle('end',end);tkTone(c,x,run)});
+  document.querySelectorAll('[data-r="tp'+i+'"]').forEach(e=>e.textContent=idle?'Idle':run?'● Live':'Ended');
+  document.querySelectorAll('[data-r="tn'+i+'"]').forEach(e=>e.textContent=idle?'Press start when the chat begins.':run?'Chat in progress… press Chat ended when done.':'Chat duration: '+hms(x.b-x.a)+'. Press Reset to clear.');
+  document.querySelectorAll('[data-k="s'+i+'"]').forEach(e=>e.disabled=!idle);
+  document.querySelectorAll('[data-k="e'+i+'"]').forEach(e=>e.disabled=!run);
+  document.querySelectorAll('[data-k="c'+i+'"]').forEach(e=>e.disabled=!end);
+  document.querySelectorAll('[data-k="r'+i+'"]').forEach(e=>e.disabled=idle)})
+ tkSumUpd();if(!any&&TK.iv){clearInterval(TK.iv);TK.iv=null}}
+
+function initTK(root){tkBind(root);
+ root.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.k,i=+k[1],x=TK.s[i];
+  if(k[0]==='s'&&!x.a)x.a=Date.now();
+  else if(k[0]==='e'&&x.a&&!x.b){x.b=Date.now();TKH.push({d:today(),ms:x.b-x.a});ST.set('pb-tkh',JSON.stringify(TKH.slice(-200)))}
+  else if(k[0]==='r'){x.a=0;x.b=0}
+  else if(k[0]==='c'&&x.a&&x.b){const t='Chat duration: '+hms(x.b-x.a),o=b.textContent,ok=()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1600)};(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok,()=>{legacy(t);ok()})}
+  tkSave();tkUpdate()});
+ tkUpdate();if(TK.iv)clearInterval(TK.iv);TK.iv=setInterval(tkUpdate,1000)}
+
+/* ===== Added features: favorites, escalation, shift tools, notes, history, timer stats ===== */
+const J=(k,d)=>{try{const v=JSON.parse(ST.get(k));return v==null?d:v}catch(e){return d}},today=()=>new Date().toISOString().slice(0,10);
+const cpy=(b,t)=>{const o=b.textContent,ok=()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1600)};(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok,()=>{legacy(t);ok()})};
+let FAV=J('pb-fav',[]),REC=J('pb-rec',[]),CH=J('pb-ch',[]),TKH=J('pb-tkh',[]);
+const lab=k=>{const[a,b]=k.split(':'),p=P[a],e=p&&p.entries[b];return e?icon(p.name)+' '+esc(e.path.join(' › ')):''};
+const toggleFav=k=>{FAV=FAV.includes(k)?FAV.filter(x=>x!==k):[k,...FAV];ST.set('pb-fav',JSON.stringify(FAV))};
+const rec=k=>{if(REC[0]===k)return;REC=[k,...REC.filter(x=>x!==k)].slice(0,5);ST.set('pb-rec',JSON.stringify(REC))};
+const favHtml=()=>{const row=(t,a)=>{a=a.filter(lab);return a.length?'<div class="lbl">'+t+'</div><div class="row">'+a.map(k=>'<button class="chip" data-p="'+k.split(':')[0]+'" data-e="'+k.split(':')[1]+'">'+lab(k)+'</button>').join('')+'</div>':''};return row('⭐ Favorites',FAV)+row('🕒 Recent',REC)};
+/* calculator history */
+function chUpd(){document.querySelectorAll('[data-r="ch"]').forEach(e=>{e.innerHTML=CH.length?'<div class="card"><div class="lbl">🧾 History <button class="chip" data-hc="x" style="margin-left:auto">Clear</button></div>'+CH.map((c,i)=>'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)"><span class="mu">'+new Date(c.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' · $'+c.a+' · '+esc(c.i)+' → <b style="color:var(--tx)">$'+c.r+'</b></span><button class="chip" data-hc="'+i+'">📋</button></div>').join('')+'</div>':'';e.onclick=ev=>{const b=ev.target.closest('[data-hc]');if(!b)return;if(b.dataset.hc!=='x'){cpy(b,CH[+b.dataset.hc].m);return}CH=[];ST.set('pb-ch','[]');chUpd()}})}
+/* timer extras */
+const tgt=()=>{const v=ST.get('pb-tgt');return v===null?20:+v||0};
+const tkTone=(c,x,run)=>{const ms=Date.now()-x.a,t=tgt()*60000;c.classList.toggle('over',run&&t>0&&ms>t);c.classList.toggle('warn',run&&t>0&&ms>t*.8&&ms<=t)};
+const tkSum=()=>'<div class="card"><div class="lbl">📈 Today <span class="pill" data-r="ts"></span></div><div class="mu" style="margin-top:8px">Warn at (minutes, 0 = off). Amber at 80%, red when over.</div><div class="fld" style="margin-bottom:0"><input data-r="tgt" type="number" min="0" step="1" value="'+tgt()+'"></div><button class="chip" data-r="tkc" style="margin-top:8px">Clear stats</button></div>';
+const tkSumUpd=()=>{const a=TKH.filter(x=>x.d===today()),n=a.length,av=n?a.reduce((t,x)=>t+x.ms,0)/n:0;document.querySelectorAll('[data-r="ts"]').forEach(e=>e.textContent=n+(n==1?' chat':' chats')+(n?' · avg '+hms(av):''))};
+const tkBind=root=>{const i=root.querySelector('[data-r="tgt"]'),c=root.querySelector('[data-r="tkc"]');if(i)i.oninput=()=>ST.set('pb-tgt',String(Math.max(0,+i.value||0)));if(c)c.onclick=()=>{TKH=[];ST.set('pb-tkh','[]');tkSumUpd()}};
+/* escalation checker (rules taken from the processes in this app) */
+const ESQT=[['rq','Customer asked to escalate'],['mg','Customer asked for a manager'],['sm','Customer threatened to share it on social media'],['lg','Customer threatened legal action']];
+const ESQ=[['hs','Health and safety issue'],['hc','Hotel cancelled the booking on the customer'],['na','Hotel is not able to accommodate the customer'],['car','Car refund / price difference is $500 or more'],['act','Activity refund is over $500'],['vn','Car vendor could not be reached'],['lim','Adjustment is over your tool limit']];
+const chk=q=>'<label style="display:flex;gap:10px;align-items:center;padding:8px 0"><input type="checkbox" data-q="'+q[0]+'" style="width:auto"> '+q[1]+'</label>';
+const escHtml=()=>'<div class="card"><div class="lbl">Customer request</div>'+ESQT.map(chk).join('')+'<div class="lbl">Booking amount (USD)</div><div class="fld amt"><span>$</span><input data-r="eamt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div></div><div class="card"><div class="lbl">Other situations</div>'+ESQ.map(chk).join('')+'</div><div data-r="eo"></div>';
+function initEsc(root){const o=root.querySelector('[data-r="eo"]'),am=root.querySelector('[data-r="eamt"]'),go=()=>{const on=[...root.querySelectorAll('[data-q]:checked')].map(x=>x.dataset.q),r=[],amt=parseFloat(am.value)||0;
+if(on.some(x=>['rq','mg','sm','lg'].includes(x))){if(amt<=0)r.push(['💵','Enter the booking amount to see who to escalate to.']);else if(amt<500)r.push(['👤','Ask for a local supervisor.']);else r.push(['🚨','Transfer to Tier 3 immediately.'])}
+if(on.some(x=>['hs','hc','na'].includes(x)))r.push(['🚨','Transfer to Relocation / Tier 3 Team.']);
+if(on.some(x=>['car','act'].includes(x)))r.push(['📝','Create a Refund Over $500 SR.']);
+if(on.includes('vn'))r.push(['📞','Tell the customer you could not reach the vendor. For merchant bookings assign an SR to reach the vendor; otherwise follow the Cars process for that payment type.']);
+if(on.includes('lim'))r.push(['✉️','Use the adjustment-limit email template. Premium/Tier 3 can make several transactions up to $1,000 in total.']);
+o.innerHTML=r.length?'<div class="card res">'+r.map(x=>'<div style="margin:6px 0">'+x[0]+' <b>'+x[1]+'</b></div>').join('')+'</div>':'<div class="hint">Nothing ticked: handle it yourself. Check the reasons in the calculator and proceed with the OKC accordingly.</div>'};root.onchange=go;root.oninput=go;go()}
+/* shift tools */
+const AL={b:['Break',15,2],l:['Lunch',30,1],p:['Personal',15,1]},TLB=[['cases','Cases'],['tr','Transfers'],['sr','SRs']],t0=()=>({d:today(),c:{cases:0,tr:0,sr:0}});
+let SV=J('pb-sv',{d:today(),cur:null,log:[]}),TL=J('pb-tl',t0()),shIv=0;if(SV.d!==today())SV={d:today(),cur:null,log:[]};if(TL.d!==today())TL=t0();
+const shSave=()=>{ST.set('pb-sv',JSON.stringify(SV));ST.set('pb-tl',JSON.stringify(TL))},usedN=k=>SV.log.filter(x=>x.k===k).length+(SV.cur&&SV.cur.k===k?1:0);
+const vtxt=(u,al)=>u<al?'<span style="color:#0b8a55">'+hms(al-u)+' early</span>':u>al?'<span style="color:#e03131">'+hms(u-al)+' over</span>':'on time';
+const shHtml=()=>'<div class="card"><div class="lbl">⏱️ Variance minutes <span class="pill" data-r="bp">Idle</span></div><div class="clk" data-r="bc">00:00</div><div class="mu" data-r="bv"></div><div class="row" style="margin-top:10px">'+Object.keys(AL).map(k=>'<button class="chip" data-s="'+k+'">'+AL[k][0]+' ('+AL[k][1]+'m)</button>').join('')+'<button class="chip" data-s="stop">✅ Back / Stop</button></div></div><div class="card"><div class="lbl">📅 Left today</div><div data-r="bl"></div></div><div class="card"><div class="lbl">🧾 History <button class="chip" data-s="reset" style="margin-left:auto">↺ Reset day</button></div><div data-r="bh"></div></div><div class="card"><div class="lbl">🔢 Tally for today</div>'+TLB.map(t=>'<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0"><b>'+t[1]+'</b><span><button class="chip" data-tl="'+t[0]+'" data-dl="-1">−</button> <b data-r="t_'+t[0]+'" style="display:inline-block;min-width:34px;text-align:center"></b> <button class="chip" data-tl="'+t[0]+'" data-dl="1">+</button></span></div>').join('')+'<button class="chip" data-tl="reset" style="margin-top:8px">↺ Reset tally</button></div>';
+function shUpd(){const w=document.querySelectorAll('[data-r="bc"]');if(!w.length){clearInterval(shIv);shIv=0;return}
+TLB.forEach(t=>document.querySelectorAll('[data-r="t_'+t[0]+'"]').forEach(e=>e.textContent=TL.c[t[0]]));
+const c=SV.cur,el=c?Date.now()-c.t:0,al=c?AL[c.k][1]*6e4:0,over=!!c&&el>al,set=(n,f)=>document.querySelectorAll('[data-r="'+n+'"]').forEach(f);
+w.forEach(x=>{x.textContent=c?hms(el):'00:00';x.classList.toggle('over',over);x.classList.toggle('warn',!!c&&!over&&al-el<6e4)});
+set('bp',e=>e.textContent=c?(over?'⚠️ Over':'● '+AL[c.k][0]):'Idle');
+set('bv',e=>e.innerHTML=c?(over?'Exceeded by <b>'+hms(el-al)+'</b> (allowed '+AL[c.k][1]+' min)':'<b>'+hms(al-el)+'</b> left of '+AL[c.k][1]+' min'):'Start a break, lunch or personal time. Variance shows live, and early/over is saved when you press Back.');
+document.querySelectorAll('[data-s]').forEach(b=>{const k=b.dataset.s;if(k==='stop')b.disabled=!c;else if(k!=='reset')b.disabled=!!c||usedN(k)>=AL[k][2]});
+set('bl',e=>e.innerHTML=Object.keys(AL).map(k=>{const tot=AL[k][1]*AL[k][2]*6e4,u=SV.log.filter(x=>x.k===k).reduce((a,x)=>a+x.ms,0)+(c&&c.k===k?el:0),l=tot-u;return '<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0"><b>'+AL[k][0]+' ×'+AL[k][2]+'</b><span class="mu">'+Math.max(0,AL[k][2]-usedN(k))+' left · '+(l>=0?hms(l)+' min left':'<span style="color:#e03131">exceeded by '+hms(-l)+'</span>')+'</span></div>'}).join(''));
+set('bh',e=>e.innerHTML=SV.log.length?SV.log.slice().reverse().map(x=>'<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd)"><span><b>'+AL[x.k][0]+'</b> <span class="mu">'+new Date(x.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' · used '+hms(x.ms)+'</span></span><span>'+vtxt(x.ms,AL[x.k][1]*6e4)+'</span></div>').join(''):'<div class="mu">No breaks logged yet today.</div>')}
+function initSH(root){root.onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+if(d.s==='stop'){if(SV.cur){SV.log.push({k:SV.cur.k,t:SV.cur.t,ms:Date.now()-SV.cur.t});SV.cur=null}}
+else if(d.s==='reset')SV={d:today(),cur:null,log:[]};
+else if(d.s){if(!SV.cur&&usedN(d.s)<AL[d.s][2])SV.cur={k:d.s,t:Date.now()}}
+else if(d.tl==='reset')TL=t0();else if(d.tl)TL.c[d.tl]=Math.max(0,TL.c[d.tl]+ +d.dl);shSave();shUpd()};shUpd();if(!shIv)shIv=setInterval(shUpd,1000)}
+/* notes (multiple) */
+let NT=J('pb-notes',null)||{1:ST.get('pb-note')||''};const svNT=()=>ST.set('pb-notes',JSON.stringify(NT));
+const noteHtml=()=>'<textarea data-r="nt" placeholder="Jot case notes, reminders, itinerary numbers…" style="width:100%;min-height:200px;resize:vertical;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--card2);color:var(--tx);font:inherit"></textarea><div class="row" style="margin-top:8px"><button class="chip" data-n="new">➕ New note</button><button class="chip" data-n="ts">🕒 Time stamp</button><button class="chip" data-n="cp">📋 Copy</button><button class="chip" data-n="cl">🧹 Clear</button><button class="chip" data-n="del">🗑️ Delete</button><span class="mu" data-r="nc" style="align-self:center"></span></div>';
+function initNote(root,id){const t=root.querySelector('[data-r="nt"]'),c=root.querySelector('[data-r="nc"]'),u=()=>{NT[id]=t.value;svNT();c.textContent=t.value.length+' chars'};t.value=NT[id]||'';u();t.oninput=u;root.onclick=e=>{const b=e.target.closest('button[data-n]');if(!b)return;const k=b.dataset.n;if(k==='ts'){t.setRangeText('['+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'] ',t.selectionStart,t.selectionEnd,'end');t.focus()}else if(k==='cp')cpy(b,t.value);else if(k==='new')openToolModal('n',String(Math.max(0,...Object.keys(NT).map(Number))+1));else if(k==='del'){delete NT[id];svNT();root.closest('.tool-win').querySelector('.tw-x').click();return}else t.value='';u()}}
+/* shift summary + long contact % */
+const ssThr=()=>(ST.get('pb-lob')==='n'?40:20)*6e4;
+function ssTxt(){const a=TKH.filter(x=>x.d===today()),n=a.length,thr=ssThr(),lc=a.filter(x=>x.ms>=thr).length,av=n?a.reduce((t,x)=>t+x.ms,0)/n:0;
+const br=Object.keys(AL).map(k=>{const l=SV.log.filter(x=>x.k===k),v=l.reduce((t,x)=>t+x.ms-AL[k][1]*6e4,0);return AL[k][0]+': '+l.length+'/'+AL[k][2]+(l.length?' ('+(v<=0?hms(-v)+' early':hms(v)+' over')+')':'')});
+return ['Shift summary '+today(),'LOB: '+(thr>12e5?'Non-lodging (LC = 40+ min)':'Lodging (LC = 20+ min)'),'Handled: '+n,'Long contacts: '+lc,'LC%: '+(n?(lc/n*100).toFixed(1):'0.0')+'%','Avg handle time: '+(n?hms(av):'-'),...br,'Cases: '+TL.c.cases+' · Transfers: '+TL.c.tr+' · SRs: '+TL.c.sr].join('\n')}
+const ssHtml=()=>'<div class="card"><div class="lbl">Line of business</div><div class="fld" style="margin:0"><select data-r="lob"><option value="l">Lodging (LC = 20 min or more)</option><option value="n">Non-lodging (LC = 40 min or more)</option></select></div></div><div class="card"><div class="lbl">📊 Long contact %</div><div class="clk" data-r="lcp">0%</div><div class="mu" data-r="lcd"></div></div><div class="card"><div class="lbl">🧾 Shift summary</div><div data-r="sst" style="white-space:pre-wrap;font-size:13px;line-height:1.5"></div><button class="chip" data-ssc="1" style="margin-top:10px">📋 Copy summary</button></div>';
+let ssIv=0;
+function ssUpd(){const w=document.querySelectorAll('[data-r="sst"]');if(!w.length){clearInterval(ssIv);ssIv=0;return}
+const a=TKH.filter(x=>x.d===today()),n=a.length,lc=a.filter(x=>x.ms>=ssThr()).length;
+document.querySelectorAll('[data-r="lcp"]').forEach(e=>e.textContent=(n?lc/n*100:0).toFixed(1)+'%');
+document.querySelectorAll('[data-r="lcd"]').forEach(e=>e.textContent=lc+' long contacts ÷ '+n+' handled');
+w.forEach(e=>e.textContent=ssTxt())}
+function initSS(root){const sl=root.querySelector('[data-r="lob"]');sl.value=ST.get('pb-lob')==='n'?'n':'l';sl.onchange=()=>{ST.set('pb-lob',sl.value);ssUpd()};root.querySelector('[data-ssc]').onclick=e=>cpy(e.target,ssTxt());ssUpd();if(!ssIv)ssIv=setInterval(ssUpd,1000)}
+/* pin + rearrange sidebar tools */
+let TORD=J('pb-tord',[]),TPIN=J('pb-tpin',[]);
+const tkeys=()=>{const all=TOOLS.map(t=>t[2]),o=TORD.filter(k=>all.includes(k));all.forEach(k=>o.includes(k)||o.push(k));return o};
+function renderTools(){const o=tkeys(),ks=[...o.filter(k=>TPIN.includes(k)),...o.filter(k=>!TPIN.includes(k))],bs='padding:4px 8px';
+$('sidebarToolsList').innerHTML=ks.map(k=>{const t=TOOLS.find(x=>x[2]===k),main=k.startsWith('tool:')?'<button class="tl" data-tool="'+k.replace('tool:','')+'" style="width:100%; text-align:left; cursor:pointer; background:var(--card2); border:1px solid var(--bd);"><span>'+t[0]+'</span>'+esc(t[1])+'</button>':'<a class="tl" href="'+esc(k)+'" target="_blank" rel="noopener noreferrer"><span>'+t[0]+'</span>'+esc(t[1])+'</a>';
+return '<div style="display:flex;gap:4px;align-items:center"><div style="flex:1;min-width:0">'+main+'</div><button class="chip" data-pin="'+esc(k)+'" title="Pin to top" style="'+bs+'">'+(TPIN.includes(k)?'📌':'📍')+'</button><button class="chip" data-mv="'+esc(k)+'" data-dir="-1" title="Move up" style="'+bs+'">▲</button><button class="chip" data-mv="'+esc(k)+'" data-dir="1" title="Move down" style="'+bs+'">▼</button></div>'}).join('')}
+$('sidebarToolsList').addEventListener('click',e=>{const b=e.target.closest('[data-pin],[data-mv]');if(!b)return;const k=b.dataset.pin||b.dataset.mv;
+if(b.dataset.pin)TPIN=TPIN.includes(k)?TPIN.filter(x=>x!==k):[...TPIN,k];
+else{const arr=tkeys(),pn=x=>TPIN.includes(x),d=+b.dataset.dir,i=arr.indexOf(k);let j=i+d;while(arr[j]!==undefined&&pn(arr[j])!==pn(k))j+=d;if(arr[j]!==undefined){[arr[i],arr[j]]=[arr[j],arr[i]];TORD=arr}}
+ST.set('pb-tord',JSON.stringify(TORD));ST.set('pb-tpin',JSON.stringify(TPIN));renderTools()});
+renderTools();
+/* sound alerts */
+let pbSOn=ST.get('pb-snd')!=='0',pbAC;
+const pbUnlock=()=>{try{pbAC=pbAC||new(window.AudioContext||window.webkitAudioContext)();pbAC.resume()}catch(e){}};addEventListener('pointerdown',pbUnlock);
+const pbBeep=(n,f)=>{if(!pbSOn)return;pbUnlock();if(!pbAC)return;for(let i=0;i<n;i++){const o=pbAC.createOscillator(),g=pbAC.createGain(),t=pbAC.currentTime+i*.3;o.frequency.value=f;g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);g.connect(pbAC.destination);o.start(t);o.stop(t+.25)}};
+const pbSnd=document.createElement('button');pbSnd.type='button';pbSnd.className='chip';pbSnd.style.cssText='position:fixed;right:10px;bottom:10px;z-index:10003;box-shadow:var(--sh)';
+const pbSndLbl=()=>{pbSnd.textContent=pbSOn?'🔔 Sound on':'🔕 Muted'};pbSndLbl();document.body.appendChild(pbSnd);
+pbSnd.onclick=()=>{pbSOn=!pbSOn;ST.set('pb-snd',pbSOn?'1':'0');pbSndLbl();pbBeep(1,660)};
+const pbFired=new Set(),pbOnce=(k,n,f)=>{if(!pbFired.has(k)){pbFired.add(k);pbBeep(n,f)}};
+setInterval(()=>{const now=Date.now(),t=tgt()*6e4;
+TK.s.forEach((x,i)=>{if(x.a>0&&!x.b&&t>0){const ms=now-x.a;if(ms>t)pbOnce('t'+i+x.a+'o',3,880);else if(ms>t*.8)pbOnce('t'+i+x.a+'w',1,660)}});
+const c=SV.cur;if(c){const left=AL[c.k][1]*6e4-(now-c.t);if(left<=0)pbOnce('b'+c.t+'o',3,880);else if(left<=6e4)pbOnce('b'+c.t+'w',1,660)}},1000);
+
+ctl();scene();render();
+</script>
+</body>
+</html>
